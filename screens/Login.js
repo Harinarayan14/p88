@@ -91,11 +91,11 @@ export default class LoginScreen extends Component {
       <View style={styles.container}>
         <SafeAreaView />
         <View style={styles.upperContainer}>
-          <Image source={require("../assets/santa.png")} style={styles.image} />
+          <Text>Barter System App</Text>
         </View>
         <View style={styles.middleContainer}>
           <CustomInput
-            placeholder={"abc@example.com"}
+            placeholder={"Email id"}
             keyboardType={"email-address"}
             onChangeText={text => {
               this.setState({
@@ -105,7 +105,7 @@ export default class LoginScreen extends Component {
           />
           <CustomInput
             secureTextEntry={true}
-            placeholder={"Enter Password"}
+            placeholder={"Password"}
             onChangeText={text => {
               this.setState({
                 password: text
@@ -117,14 +117,8 @@ export default class LoginScreen extends Component {
             onPress={() => this.handleLogin(email, password)}
           />
           <CustomButton
-            title={"SignUp"}
+            title={"Sign up"}
             onPress={() => this.handleSignUp(email, password)}
-          />
-        </View>
-        <View style={styles.lowerContainer}>
-          <Image
-            source={require("../assets/book.png")}
-            style={styles.bookImage}
           />
         </View>
         <SignUpModal
@@ -149,7 +143,7 @@ export default class LoginScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#6fc0b8"
+    backgroundColor: "#aa55ff"
   },
   upperContainer: {
     flex: 0.25,
@@ -165,11 +159,6 @@ const styles = StyleSheet.create({
     flex: 0.42,
     alignItems: "center",
     justifyContent: "space-evenly"
-  },
-  lowerContainer: {
-    flex: 0.33,
-    justifyContent: "center",
-    alignItems: "center"
   },
   bookImage: {
     width: "100%",

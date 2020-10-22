@@ -7,67 +7,67 @@ import db from "../config.js";
 import MyHeader from "../components/MyHeader";
 import CustomButton from "../components/CustomButton";
 
-export default class MyDonationScreen extends Component {
+export default class MyExchangeScreen extends Component {
   constructor() {
     super();
     this.state = {
-      donorId: firebase.auth().currentUser.email,
-      allDonations: []
+      exchangerId: firebase.auth().currentUser.email,
+      allExchanges: []
     };
-    this.requestRef = null;
+    this.exchangeRef = null;
   }
 
   componentDidMount() {
-    this.getDonations();
+    this.getExchanges();
   }
 
-  getDonations = () => {
-    const { donorId } = this.state;
-    this.requestRef = db
-      .collection("all_donations")
-      .where("donor_id", "==", donorId)
+  getExchanges = () => {
+    const { exchangerId } = this.state;
+    this.exchangeRef = db
+      .collection("all_exchanges")
+      .where("exchanger_id", "==", exchangerId)
       .onSnapshot(
         snapshot => {
-          let donations = [];
+          let exchanges = [];
           snapshot.docs.map(doc => {
             let details = doc.data();
             details["doc_id"] = doc.id;
-            donations.push(details);
+            exchanges.push(details);
           });
           this.setState({
-            allDonations: donations
+            allExchanges: exchanges
           });
         },
         () => {
-          this.requestRef();
+          this.exchangeRef();
         }
       );
   };
 
-  handleSendBook = bookDetails => {
-    const donationRef = db.collection("all_donations").doc(bookDetails.doc_id);
-    const { request_status } = bookDetails;
-    const requestStatus =
-      request_status === "Book Sent" ? "Donor Interested" : "Book Sent";
+  handleSendItem = itemDetails => {
+    const exchangeRef = db.collection("all_exchanges").doc(itemDetails.doc_id);
+    const { exchange_status } = itemDetails;
+    const exchangeStatus =
+      exchange_status === "Item Sent" ? "Exchanger Interested" : "Item Sent";
 
-    donationRef.update({
-      request_status: requestStatus
+    exchangeRef.update({
+      exchange_status: exchangeStatus
     });
-    this.sendNotification(bookDetails, requestStatus);
+    this.sendNotification(itemDetails, exchangeStatus);
   };
 
-  sendNotification = (bookDetails, requestStatus) => {
-    const { request_id, donor_id } = bookDetails;
+  sendNotification = (itemDetails, exchangeStatus) => {
+    const { exchange_id, exchanger_id } = itemDetails;
     db.collection("all_notifications")
-      .where("request_id", "==", request_id)
-      .where("donor_id", "==", donor_id)
+      .where("exchange_id", "==", exchange_id)
+      .where("exchanger_id", "==", exchanger_id)
       .get()
       .then(snapshot => {
         snapshot.docs.map(doc => {
           const message =
-            requestStatus === "Book Sent"
-              ? `${this.state.donorName} sent you book`
-              : `${this.state.donorName} has shown interest in donating the book`;
+            exchangeStatus === "Item Sent"
+              ? `${this.state.exchangerName} sent you item`
+              : `${this.state.exchangerName} has shown interest in exchanging the item`;
 
           db.collection("all_notifications")
             .doc(doc.id)
@@ -81,7 +81,7 @@ export default class MyDonationScreen extends Component {
   };
 
   componentWillUnmount() {
-    this.requestRef();
+    this.exchangeRef();
   }
 
   keyExtractor = (item, index) => index.toString();
@@ -89,35 +89,35 @@ export default class MyDonationScreen extends Component {
   renderItem = ({ item, i }) => (
     <ListItem
       key={i}
-      title={item.book_name}
+      title={item.item_name}
       subtitle={
-        "Requested By : " +
-        item.requested_by +
+        "Exchanged By : " +
+        item.exchanged_by +
         "\nStatus : " +
-        item.request_status
+        item.exchange_status
       }
-      leftElement={<Icon name="book" type="font-awesome" color="#696969" />}
+      leftElement={<Icon name="item" type="font-awesome" color="#696969" />}
       titleStyle={styles.title}
       rightElement={
         <CustomButton
           title={
-            item.request_status === "Book Sent" ? "Book Sent" : "Send Book"
+            item.exchange_status === "Item Sent" ? "Item Sent" : "Send Item"
           }
           style={[
             styles.button,
             {
               backgroundColor:
-                item.request_status === "Book Sent" ? "green" : "#fff"
+                item.exchange_status === "Item Sent" ? "green" : "#fff"
             }
           ]}
           titleStyle={[
             styles.buttonText,
             {
-              color: item.request_status === "Book Sent" ? "#fff" : "#000"
+              color: item.exchange_status === "Item Sent" ? "#fff" : "#000"
             }
           ]}
           onPress={() => {
-            this.handleSendBook(item);
+            this.handleSendItem(item);
           }}
         />
       }
@@ -128,17 +128,17 @@ export default class MyDonationScreen extends Component {
   render() {
     return (
       <View sytyle={styles.container}>
-        <MyHeader navigation={this.props.navigation} title="My Donations" />
-        {this.state.allDonations.length === 0 ? (
+        <MyHeader navigation={this.props.navigation} title="My Exchanges" />
+        {this.state.allExchanges.length === 0 ? (
           <View style={styles.emptyList}>
             <Text style={styles.emptyListTitle}>
-              List of all book Donations
+              List of all item Exchanges
             </Text>
           </View>
         ) : (
           <FlatList
             keyExtractor={this.keyExtractor}
-            data={this.state.allDonations}
+            data={this.state.allExchanges}
             renderItem={this.renderItem}
           />
         )}
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   title: {
-    color: "#000",
+    color: "#1fa",
     fontWeight: "bold"
   },
   emptyList: {

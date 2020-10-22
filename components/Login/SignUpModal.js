@@ -22,7 +22,7 @@ const SignUpModal = props => (
               name={"cross"}
               type={"entypo"}
               size={50}
-              color={"#6fc0b8"}
+              color={"#ffaa11"}
               containerStyle={styles.icon}
               onPress={props.onCancle}
             />
@@ -54,7 +54,7 @@ const SignUpModal = props => (
           />
           <CustomInput
             style={styles.input}
-            placeholder={"Email"}
+            placeholder={"Email-Id"}
             keyboardType={"email-address"}
             onChangeText={text => props.setEmail(text)}
           />
@@ -66,7 +66,7 @@ const SignUpModal = props => (
           />
           <CustomInput
             style={styles.input}
-            placeholder={"Confrim Password"}
+            placeholder={"Confirm Password"}
             secureTextEntry={true}
             onChangeText={text => props.setConfirmPassword(text)}
           />
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 30,
     fontWeight: "500",
-    color: "#6fc0b8",
+    color: "#22ee55",
     marginTop: 30
   },
   icon: {
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     width: "75%",
     height: 55,
     marginTop: 20,
-    borderColor: "#6fc0b8",
+    borderColor: "#ff0011",
     fontSize: 20,
     fontWeight: "400"
   },

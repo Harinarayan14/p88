@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet, Image } from "react-native";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { AppStackNavigator } from "./AppStackNavigator";
-import BookDonateScreen from "../screens/BookDonate";
-import BookRequestScreen from "../screens/BookRequest";
+import ItemDonateScreen from "../screens/ItemDonate";
+import ItemExchangeScreen from "../screens/ItemExchange";
 
 export const AppTabNavigator = createBottomTabNavigator({
   AppStack: {
@@ -11,29 +11,29 @@ export const AppTabNavigator = createBottomTabNavigator({
     navigationOptions: {
       tabBarIcon: (
         <Image
-          source={require("../assets/request-list.png")}
+          source={require("../assets/home.png")}
           style={{
             width: 20,
             height: 20
           }}
         />
       ),
-      tabBarLabel: "Donate Books"
+      tabBarLabel: "Home"
     }
   },
-  BookRequest: {
-    screen: BookRequestScreen,
+  ItemExchange: {
+    screen: ItemExchangeScreen,
     navigationOptions: {
       tabBarIcon: (
         <Image
-          source={require("../assets/request-book.png")}
+          source={require("../assets/exchange-item.png")}
           style={{
             width: 20,
             height: 20
           }}
         />
       ),
-      tabBarLabel: "Book Request"
+      tabBarLabel: "Item Exchange"
     }
   }
 });

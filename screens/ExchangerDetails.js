@@ -7,56 +7,56 @@ import db from "../config.js";
 import MyHeader from "../components/MyHeader";
 import CustomButton from "../components/CustomButton";
 
-export default class RecieverDetailsScreen extends Component {
+export default class ExchangerDetailsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       userId: firebase.auth().currentUser.email,
       userName: "",
-      recieverId: this.props.navigation.getParam("details")["user_id"],
-      requestId: this.props.navigation.getParam("details")["request_id"],
-      bookName: this.props.navigation.getParam("details")["book_name"],
-      reasonToRequesting: this.props.navigation.getParam("details")[
-        "reason_to_request"
+      exchangerId: this.props.navigation.getParam("details")["user_id"],
+      exchangeId: this.props.navigation.getParam("details")["exchange_id"],
+      itemName: this.props.navigation.getParam("details")["item_name"],
+      description: this.props.navigation.getParam("details")[
+        "description"
       ],
-      recieverName: "",
-      recieverContact: "",
-      recieverAddress: "",
-      recieverRequestDocId: ""
+      exchangerName: "",
+      exchangerContact: "",
+      exchangerAddress: "",
+      exchangerExchangeDocId: ""
     };
   }
 
-  getRecieverDetails = () => {
+  getExchangerDetails = () => {
     db.collection("users")
-      .where("email_id", "==", this.state.recieverId)
+      .where("email_id", "==", this.state.exchangerId)
       .get()
       .then(snapshot => {
         snapshot.forEach(doc => {
           this.setState({
-            recieverName: doc.data().first_name,
-            recieverContact: doc.data().contact,
-            recieverAddress: doc.data().address
+            exchangerName: doc.data().first_name,
+            exchangerContact: doc.data().contact,
+            exchangerAddress: doc.data().address
           });
         });
       });
 
-    db.collection("requested_books")
-      .where("request_id", "==", this.state.requestId)
+    db.collection("exchanged_items")
+      .where("exchange_id", "==", this.state.exchangeId)
       .get()
       .then(snapshot => {
         snapshot.forEach(doc => {
-          this.setState({ recieverRequestDocId: doc.id });
+          this.setState({ exchangerExchangeDocId: doc.id });
         });
       });
   };
 
-  updateBookStatus = () => {
-    db.collection("all_donations").add({
-      book_name: this.state.bookName,
-      request_id: this.state.requestId,
-      requested_by: this.state.recieverName,
-      donor_id: this.state.userId,
-      request_status: "Donor Interested"
+  updateItemStatus = () => {
+    db.collection("all_exchanges").add({
+      item_name: this.state.itemName,
+      exchange_id: this.state.exchangeId,
+      exchanged_by: this.state.exchangerName,
+      exchanger_id: this.state.userId,
+      exchange_status: "Exchanger Interested"
     });
   };
 
@@ -76,41 +76,41 @@ export default class RecieverDetailsScreen extends Component {
   addNotification = () => {
     const { userName } = this.state;
     db.collection("all_notifications").add({
-      targeted_user_id: this.state.recieverId,
-      donor_id: this.state.userId,
-      request_id: this.state.requestId,
-      book_name: this.state.bookName,
+      targeted_user_id: this.state.exchangerId,
+      exchanger_id: this.state.userId,
+      exchange_id: this.state.exchangeId,
+      item_name: this.state.itemName,
       date: firebase.firestore.FieldValue.serverTimestamp(),
       notification_status: "unread",
-      message: `${userName} has shown interest in donating the book`
+      message: `${userName} has shown interest in exchanging the item`
     });
   };
 
   componentDidMount() {
     const { userId } = this.state;
-    this.getRecieverDetails();
+    this.getExchangerDetails();
     this.getUserDetails(userId);
   }
 
   render() {
     var {
-      recieverId,
+      exchangerId,
       userId,
-      bookName,
-      reasonToRequesting,
-      recieverName,
-      recieverContact,
-      recieverAddress
+      itemName,
+      description,
+      exchangerName,
+      exchangerContact,
+      exchangerAddress
     } = this.state;
 
-    var bookInfoList = [
-      { type: "Name", value: recieverName },
-      { type: "Contact", value: recieverContact }
+    var itemInfoList = [
+      { type: "Name", value: exchangerName },
+      { type: "Contact", value: exchangerContact }
     ];
 
-    var recieverInfoList = [
-      { type: "Name", value: bookName },
-      { type: "Reason", value: reasonToRequesting }
+    var exchangerInfoList = [
+      { type: "Name", value: itemName },
+      { type: "Description", value: description }
     ];
 
     return (
@@ -118,7 +118,7 @@ export default class RecieverDetailsScreen extends Component {
         {/* Before writing MyHeader code pass props in MyHeader */}
         <MyHeader
           navigation={this.props.navigation}
-          title={"Donate Books"}
+          title={"Exchange Items"}
           leftComponent={
             <Icon
               name={"arrow-left"}
@@ -129,11 +129,11 @@ export default class RecieverDetailsScreen extends Component {
           }
         />
         <View style={styles.upperContainer}>
-          <Card title={"Book Information"} titleStyle={styles.cardTitle}>
-            {bookInfoList.map((item, index) => (
-              <Card key={`book-card-${index}`}>
+          <Card title={"Item Information"} titleStyle={styles.cardTitle}>
+            {itemInfoList.map((item, index) => (
+              <Card key={`item-card-${index}`}>
                 <Text
-                  key={`book-card-value-${index}`}
+                  key={`item-card-value-${index}`}
                   style={{ fontWeight: "bold" }}
                 >
                   {item.type}: {item.value}
@@ -143,11 +143,11 @@ export default class RecieverDetailsScreen extends Component {
           </Card>
         </View>
         <View style={styles.middleContainer}>
-          <Card title={"Reciever Information"} titleStyle={styles.cardTitle}>
-            {recieverInfoList.map((item, index) => (
-              <Card key={`receiver-card-${index}`}>
+          <Card title={"Exchanger Information"} titleStyle={styles.cardTitle}>
+            {exchangerInfoList.map((item, index) => (
+              <Card key={`exchanger-card-${index}`}>
                 <Text
-                  key={`receiver-card-value-${index}`}
+                  key={`exchanger-card-value-${index}`}
                   style={{ fontWeight: "bold" }}
                 >
                   {item.type}: {item.value}
@@ -157,14 +157,14 @@ export default class RecieverDetailsScreen extends Component {
           </Card>
         </View>
         <View style={styles.lowerContainer}>
-          {recieverId !== userId ? (
+          {exchangerId !== userId ? (
             <CustomButton
-              title={"I want to Donate"}
+              title={"I want to Exchange"}
               style={styles.button}
               onPress={() => {
-                this.updateBookStatus();
+                this.updateItemStatus();
                 this.addNotification();
-                this.props.navigation.navigate("MyDonations");
+                this.props.navigation.navigate("MyExchanges");
               }}
               titleStyle={styles.buttonText}
             />

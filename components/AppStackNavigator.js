@@ -1,25 +1,25 @@
 import React from "react";
 import { createStackNavigator } from "react-navigation-stack";
 
-import BookDonateScreen from "../screens/BookDonate";
-import RecieverDetailsScreen from "../screens/RecieverDetails";
+import HomeScreen from "../screens/HomeScreen";
+import ExchangerDetailsScreen from "../screens/ExchangerDetails";
 
 export const AppStackNavigator = createStackNavigator(
   {
-    BookDonate: {
-      screen: BookDonateScreen,
+    Home: {
+      screen: HomeScreen,
       navigationOptions: {
         headerShown: false
       }
     },
-    RecieverDetails: {
-      screen: RecieverDetailsScreen,
+    ExchangerDetails: {
+      screen: ExchangerDetailsScreen,
       navigationOptions: {
         headerShown: false
       }
     }
   },
   {
-    initialRouteName: "BookDonate"
+    initialRouteName: "Home"
   }
 );

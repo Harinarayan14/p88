@@ -13,17 +13,17 @@ import MyHeader from "../components/MyHeader";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 
-export default class BookRequestScreen extends Component {
+export default class ItemExchangeScreen extends Component {
   constructor() {
     super();
     this.state = {
       userId: firebase.auth().currentUser.email,
-      bookName: "",
-      reasonToRequest: "",
-      isBookRequestActive: "",
-      requestedBookName: "",
-      bookStatus: "",
-      requestId: "",
+      itemName: "",
+      description: "",
+      isItemExchangeActive: "",
+      exchangedItemName: "",
+      itemStatus: "",
+      exchangeId: "",
       userDocId: "",
       docId: ""
     };
@@ -35,20 +35,20 @@ export default class BookRequestScreen extends Component {
       .substring(7);
   }
 
-  handleBookRequest = async (bookName, reasonToRequest) => {
+  handleItemExchange = async (itemName, description) => {
     var { userId } = this.state;
-    var randomRequestId = this.getUniqueId();
-    if (bookName && reasonToRequest) {
-      db.collection("requested_books").add({
+    var randomExchangeId = this.getUniqueId();
+    if (itemName && description) {
+      db.collection("exchanged_items").add({
         user_id: userId,
-        book_name: bookName,
-        reason_to_request: reasonToRequest,
-        request_id: randomRequestId,
-        book_status: "requested",
+        item_name: itemName,
+        description: description,
+        exchange_id: randomExchangeId,
+        item_status: "exchanged",
         date: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      await this.getRequestedBooks();
+      await this.getExchangedItems();
       db.collection("users")
         .where("email_id", "==", userId)
         .get()
@@ -58,36 +58,36 @@ export default class BookRequestScreen extends Component {
             db.collection("users")
               .doc(doc.id)
               .update({
-                is_book_request_active: true
+                is_item_exchange_active: true
               });
           });
         });
 
       this.setState({
-        bookName: "",
-        reasonToRequest: "",
-        requestId: randomRequestId
+        itemName: "",
+        description: "",
+        exchangeId: randomExchangeId
       });
-      Alert.alert("Book Requested Successfully");
+      Alert.alert("Item Exchanged Successfully");
     } else {
       Alert.alert("Fill the details properly");
     }
   };
 
-  getRequestedBooks = () => {
-    // getting the requested book
+  getExchangedItems = () => {
+    // getting the exchanged item
     const { userId } = this.state;
-    db.collection("requested_books")
+    db.collection("exchanged_items")
       .where("user_id", "==", userId)
       .get()
       .then(snapshot => {
         snapshot.docs.map(doc => {
           const details = doc.data();
-          if (details.book_status !== "received") {
+          if (details.item_status !== "exchanged") {
             this.setState({
-              requestId: details.request_id,
-              requestedBookName: details.book_name,
-              bookStatus: details.book_status,
+              exchangeId: details.exchange_id,
+              exchangedItemName: details.item_name,
+              itemStatus: details.item_status,
               docId: doc.id
             });
           }
@@ -95,7 +95,7 @@ export default class BookRequestScreen extends Component {
       });
   };
 
-  getActiveBookRequest = () => {
+  getActiveItemExchange = () => {
     const { userId } = this.state;
     db.collection("users")
       .where("email_id", "==", userId)
@@ -103,7 +103,7 @@ export default class BookRequestScreen extends Component {
         snapshot.docs.map(doc => {
           const details = doc.data();
           this.setState({
-            isBookRequestActive: details.is_book_request_active,
+            isItemExchangeActive: details.is_item_exchange_active,
             userDocId: doc.id
           });
         });
@@ -111,13 +111,13 @@ export default class BookRequestScreen extends Component {
   };
 
   componentDidMount() {
-    this.getRequestedBooks();
-    this.getActiveBookRequest();
+    this.getExchangedItems();
+    this.getActiveItemExchange();
   }
 
   sendNotification = () => {
     //to get the first name and last name
-    const { userId, requestId } = this.state;
+    const { userId, exchangeId } = this.state;
 
     db.collection("users")
       .where("email_id", "==", userId)
@@ -126,21 +126,21 @@ export default class BookRequestScreen extends Component {
         snapshot.docs.map(doc => {
           var name = doc.data().first_name;
           var lastName = doc.data().last_name;
-          // to get the donor id and book nam
+          // to get the exchanger id and item nam
           db.collection("all_notifications")
-            .where("request_id", "==", requestId)
+            .where("exchange_id", "==", exchangeId)
             .get()
             .then(snapshot => {
               snapshot.docs.map(doc => {
-                const donorId = doc.data().donor_id;
-                const bookName = doc.data().book_name;
-                const message = `${name} ${lastName} received the book ${bookName}`;
-                //targert user id is the donor id to send notification to the user
+                const exchangerId = doc.data().exchanger_id;
+                const itemName = doc.data().item_name;
+                const message = `${name} ${lastName} exchanged the item ${itemName}`;
+                //targert user id is the exchanger id to send notification to the user
                 db.collection("all_notifications").add({
-                  targeted_user_id: donorId,
+                  targeted_user_id: exchangerId,
                   message: message,
                   notification_status: "unread",
-                  book_name: bookName
+                  item_name: itemName
                 });
               });
             });
@@ -148,13 +148,13 @@ export default class BookRequestScreen extends Component {
       });
   };
 
-  updateBookRequestStatus = () => {
-    //updating the book status after receiving the book
+  updateItemExchangeStatus = () => {
+    //updating the item status after exchanging the item
     const { userId, docId } = this.state;
-    db.collection("requested_books")
+    db.collection("exchanged_items")
       .doc(docId)
       .update({
-        book_status: "recieved"
+        item_status: "exchanged"
       });
 
     //getting the  doc id to update the users doc
@@ -167,51 +167,51 @@ export default class BookRequestScreen extends Component {
           db.collection("users")
             .doc(doc.id)
             .update({
-              is_book_request_active: false
+              is_item_exchange_active: false
             });
         });
       });
   };
 
-  receivedBooks = bookName => {
-    const { userId, requestId } = this.state;
-    db.collection("received_books").add({
+  exchangedItems = itemName => {
+    const { userId, exchangeId } = this.state;
+    db.collection("exchanged_items").add({
       user_id: userId,
-      book_name: bookName,
-      request_id: requestId,
-      bookStatus: "received"
+      item_name: itemName,
+      exchange_id: exchangeId,
+      itemStatus: "exchanged"
     });
   };
 
   render() {
     var {
-      bookName,
-      reasonToRequest,
-      isBookRequestActive,
-      requestedBookName,
-      bookStatus
+      itemName,
+      description,
+      isItemExchangeActive,
+      exchangedItemName,
+      itemStatus
     } = this.state;
 
     return (
       <View style={styles.container}>
-        <MyHeader title="Request Book" navigation={this.props.navigation} />
-        {isBookRequestActive ? (
-          <View style={styles.requestedBookContainer}>
-            <View style={styles.requestedBookSubContainer}>
-              <Text>Book Name</Text>
-              <Text>{requestedBookName}</Text>
+        <MyHeader title="Exchange Item" navigation={this.props.navigation} />
+        {isItemExchangeActive ? (
+          <View style={styles.exchangedItemContainer}>
+            <View style={styles.exchangedItemSubContainer}>
+              <Text>Item Name</Text>
+              <Text>{exchangedItemName}</Text>
             </View>
-            <View style={styles.requestedBookSubContainer}>
-              <Text>Book Status</Text>
-              <Text>{bookStatus}</Text>
+            <View style={styles.exchangedItemSubContainer}>
+              <Text>Item Status</Text>
+              <Text>{itemStatus}</Text>
             </View>
             <CustomButton
-              title={"I recieved the book"}
+              title={"I exchanged the item"}
               onPress={() => {
-                const { requestedBookName } = this.state;
+                const { exchangedItemName } = this.state;
                 this.sendNotification();
-                this.updateBookRequestStatus();
-                this.receivedBooks(requestedBookName);
+                this.updateItemExchangeStatus();
+                this.exchangedItems(exchangedItemName);
               }}
               style={styles.button}
               titleStyle={styles.buttonTitle}
@@ -222,34 +222,34 @@ export default class BookRequestScreen extends Component {
             <CustomInput
               style={[styles.input, { height: 75 }]}
               inputContainerStyle={{ height: 60 }}
-              label={"Book Name"}
+              label={"Item Name"}
               labelStyle={{ fontSize: 20 }}
-              placeholder={"Book name"}
+              placeholder={"Item name"}
               onChangeText={text => {
                 this.setState({
-                  bookName: text
+                  itemName: text
                 });
               }}
-              value={bookName}
+              value={itemName}
             />
             <CustomInput
               style={[styles.input, { height: 170 }]}
               inputContainerStyle={{ height: 140 }}
-              label={"Reason"}
+              label={"Description"}
               labelStyle={{ fontSize: 20 }}
               multiline
               numberOfLines={8}
-              placeholder={"Why do you need the book"}
+              placeholder={"Description"}
               onChangeText={text => {
                 this.setState({
-                  reasonToRequest: text
+                  description: text
                 });
               }}
-              value={reasonToRequest}
+              value={description}
             />
             <CustomButton
-              title={"Make a request"}
-              onPress={() => this.handleBookRequest(bookName, reasonToRequest)}
+              title={"Make a exchange"}
+              onPress={() => this.handleItemExchange(itemName, description)}
               style={styles.button}
               titleStyle={styles.buttonTitle}
             />
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   input: {
     width: "90%",
     height: 65,
-    borderColor: "#6fc0b8",
+    borderColor: "#aaff55",
     borderWidth: 0,
 
     alignItems: "flex-start",
@@ -279,18 +279,18 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-    backgroundColor: "#6fc0b8",
+    backgroundColor: "#7788dd",
     alignSelf: "center"
   },
   buttonTitle: {
-    color: "#fff"
+    color: "#f1f"
   },
-  requestedBookContainer: {
+  exchangedItemContainer: {
     flex: 1,
     justifyContent: "center"
   },
-  requestedBookSubContainer: {
-    borderColor: "orange",
+  exchangedItemSubContainer: {
+    borderColor: "#11ff11",
     borderWidth: 2,
     justifyContent: "center",
     alignItems: "center",

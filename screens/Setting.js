@@ -138,12 +138,12 @@ const styles = StyleSheet.create({
   input: {
     width: "75%",
     height: 55,
-    borderColor: "#6fc0b8",
+    borderColor: "#999999",
     marginTop: 20
   },
   button: {
     marginTop: 20,
-    backgroundColor: "#6fc0b8"
+    backgroundColor: "#999999"
   },
   buttonTitle: {
     color: "#fff"

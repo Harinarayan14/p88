@@ -6,35 +6,35 @@ import db from "../config";
 import MyHeader from "../components/MyHeader";
 import CustomButton from "../components/CustomButton";
 
-export default class BookDonateScreen extends Component {
+export default class HomeScreen extends Component {
   constructor() {
     super();
     this.state = {
-      requestedBooksList: []
+      exchangedItemsList: []
     };
-    this.requestRef = null;
+    this.exchangeRef = null;
   }
 
   componentDidMount() {
-    this.getRequestedBooksList();
+    this.getExchangedItemsList();
   }
 
-  getRequestedBooksList = () => {
-    this.requestRef = db.collection("requested_books").onSnapshot(
+  getExchangedItemsList = () => {
+    this.exchangeRef = db.collection("exchanged_items").onSnapshot(
       snapshot => {
-        var requestedBooksList = snapshot.docs.map(document => document.data());
+        var exchangedItemsList = snapshot.docs.map(document => document.data());
         this.setState({
-          requestedBooksList: requestedBooksList
+          exchangedItemsList: exchangedItemsList
         });
       },
       error => {
-        this.requestRef();
+        this.exchangeRef();
       }
     );
   };
 
   componentWillUnmount() {
-    this.requestRef();
+    this.exchangeRef();
   }
 
   keyExtractor = (item, index) => index.toString();
@@ -43,8 +43,8 @@ export default class BookDonateScreen extends Component {
     return (
       <ListItem
         key={i}
-        title={item.book_name}
-        subtitle={item.reason_to_request}
+        title={item.item_name}
+        subtitle={item.reason_to_exchange}
         titleStyle={{ color: "black", fontWeight: "bold" }}
         rightElement={
           <Icon
@@ -57,7 +57,7 @@ export default class BookDonateScreen extends Component {
               alignItems: "flex-end"
             }}
             onPress={() => {
-              this.props.navigation.navigate("RecieverDetails", {
+              this.props.navigation.navigate("ExchangerDetails", {
                 details: item
               });
             }}
@@ -69,18 +69,18 @@ export default class BookDonateScreen extends Component {
   };
 
   render() {
-    var { requestedBooksList } = this.state;
+    var { exchangedItemsList } = this.state;
     return (
       <View style={styles.container}>
-        <MyHeader title={"Donate Books"} navigation={this.props.navigation} />
-        {this.state.requestedBooksList.length === 0 ? (
+        <MyHeader title={"Exchange Items"} navigation={this.props.navigation} />
+        {this.state.exchangedItemsList.length === 0 ? (
           <View style={styles.emptyListContainer}>
-            <Text style={styles.title}>List Of All Requested Books</Text>
+            <Text style={styles.title}>List Of All Exchanged Items</Text>
           </View>
         ) : (
           <FlatList
             keyExtractor={this.keyExtractor}
-            data={requestedBooksList}
+            data={exchangedItemsList}
             renderItem={this.renderItem}
           />
         )}
