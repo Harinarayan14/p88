@@ -2,7 +2,6 @@ import React from "react";
 import { StyleSheet, Image } from "react-native";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { AppStackNavigator } from "./AppStackNavigator";
-import ItemDonateScreen from "../screens/ItemDonate";
 import ItemExchangeScreen from "../screens/ItemExchange";
 
 export const AppTabNavigator = createBottomTabNavigator({
