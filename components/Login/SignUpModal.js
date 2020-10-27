@@ -70,6 +70,11 @@ const SignUpModal = props => (
             secureTextEntry={true}
             onChangeText={text => props.setConfirmPassword(text)}
           />
+          <CustomInput
+            style={styles.input}
+            placeholder={"Country Currency Code"}
+            onChangeText={text => props.setCurrency(text)}
+          />
 
           <CustomButton
             title={"Submit"}

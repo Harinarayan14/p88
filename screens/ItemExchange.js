@@ -25,7 +25,8 @@ export default class ItemExchangeScreen extends Component {
       itemStatus: "",
       exchangeId: "",
       userDocId: "",
-      docId: ""
+      docId: "",
+      itemValue:""
     };
   }
 
@@ -35,13 +36,14 @@ export default class ItemExchangeScreen extends Component {
       .substring(7);
   }
 
-  handleItemExchange = async (itemName, description) => {
+  handleItemExchange = async (itemName, description,itemValue) => {
     var { userId } = this.state;
     var randomExchangeId = this.getUniqueId();
     if (itemName && description) {
       db.collection("exchanged_items").add({
         user_id: userId,
         item_name: itemName,
+        item_value: itemValue,
         description: description,
         exchange_id: randomExchangeId,
         item_status: "exchanged",
@@ -189,7 +191,8 @@ export default class ItemExchangeScreen extends Component {
       description,
       isItemExchangeActive,
       exchangedItemName,
-      itemStatus
+      itemStatus,
+      itemValue
     } = this.state;
 
     return (
@@ -235,6 +238,19 @@ export default class ItemExchangeScreen extends Component {
             <CustomInput
               style={[styles.input, { height: 170 }]}
               inputContainerStyle={{ height: 140 }}
+              label={"Item Value"}
+              labelStyle={{ fontSize: 20 }}
+              placeholder={"Item Value"}
+              onChangeText={text => {
+                this.setState({
+                  itemValue: text
+                });
+              }}
+              value={itemValue}
+            />
+            <CustomInput
+              style={[styles.input, { height: 170 }]}
+              inputContainerStyle={{ height: 140 }}
               label={"Description"}
               labelStyle={{ fontSize: 20 }}
               multiline
@@ -249,7 +265,7 @@ export default class ItemExchangeScreen extends Component {
             />
             <CustomButton
               title={"Make a exchange"}
-              onPress={() => this.handleItemExchange(itemName, description)}
+              onPress={() => this.handleItemExchange(itemName, description,itemValue)}
               style={styles.button}
               titleStyle={styles.buttonTitle}
             />

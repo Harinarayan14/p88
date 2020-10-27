@@ -19,6 +19,9 @@ export default class ExchangerDetailsScreen extends Component {
       description: this.props.navigation.getParam("details")[
         "description"
       ],
+      itemValue: this.props.navigation.getParam("details")[
+        "item_value"
+      ],
       exchangerName: "",
       exchangerContact: "",
       exchangerAddress: "",
@@ -67,13 +70,27 @@ export default class ExchangerDetailsScreen extends Component {
       .then(snapshot => {
         snapshot.forEach(doc => {
           this.setState({
-            userName: `${doc.data().first_name} ${doc.data().last_name}`
+            userName: `${doc.data().first_name} ${doc.data().last_name}`,
+            currency:doc.data().currency
           });
         });
       });
   };
+  getData(){
+      fetch("http://data.fixer.io/api/latest?access_key=3d3f9c097476ac7c733b245b04c4bbad")
+      .then(response=>{
+        return response.json();
+      })
+      .then(responseData=>{
+        var currency  = this.state.currency;
+        var value = responseData.rates.INR;
+        this.setState({
+          itemValue:value
+        })
+      })
 
-  addNotification = () => {
+  } 
+   addNotification = () => {
     const { userName } = this.state;
     db.collection("all_notifications").add({
       targeted_user_id: this.state.exchangerId,
@@ -100,7 +117,8 @@ export default class ExchangerDetailsScreen extends Component {
       description,
       exchangerName,
       exchangerContact,
-      exchangerAddress
+      exchangerAddress,
+      itemValue
     } = this.state;
 
     var itemInfoList = [
@@ -110,7 +128,8 @@ export default class ExchangerDetailsScreen extends Component {
 
     var exchangerInfoList = [
       { type: "Name", value: itemName },
-      { type: "Description", value: description }
+      { type: "Description", value: description },
+      {type: "Item Value", value: itemValue}
     ];
 
     return (

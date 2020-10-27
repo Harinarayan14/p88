@@ -25,6 +25,7 @@ export default class LoginScreen extends Component {
       address: "",
       contact: "",
       confirmPassword: "",
+      currency:"",
       isModalVisible: false
     };
   }
@@ -34,7 +35,7 @@ export default class LoginScreen extends Component {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
-        this.props.navigation.navigate("BookDonate");
+        this.props.navigation.navigate("Home");
       })
       .catch(error => {
         Alert.alert(error.message);
@@ -53,7 +54,8 @@ export default class LoginScreen extends Component {
       address,
       email,
       password,
-      confirmPassword
+      confirmPassword,
+      currency
     } = this.state;
 
     if (password !== confirmPassword) {
@@ -69,7 +71,8 @@ export default class LoginScreen extends Component {
             contact: contact,
             email_id: email,
             address: address,
-            is_book_request_active: false
+            currency:currency,
+            is_item_exchange_active: false
           });
           Alert.alert("User Added Successfully", "", [
             {
@@ -129,6 +132,7 @@ export default class LoginScreen extends Component {
           setEmail={text => this.setState({ email: text })}
           setPassword={text => this.setState({ password: text })}
           setConfirmPassword={text => this.setState({ confirmPassword: text })}
+          setCurrency={text => this.setState({ currency: text })}
           onSubmit={() => this.handleSubmit()}
           onCancle={() => {
             this.setState({ isModalVisible: false });
